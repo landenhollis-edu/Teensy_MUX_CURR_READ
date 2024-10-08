@@ -1,0 +1,111 @@
+#include <Servo.h>
+
+servo wheel0;
+
+int mux1 = 23, mux2 = 22, mux3 = 21;
+int gyr1 = 19;
+int comp1 = 18;
+int curr1 = 20, curr2 = 17, curr3 = 16, curr4 = 15, curr5 = 14, curr6 = 41;
+int muxout1 = 33, muxout2 = 34, muxout3 = 35, muxout4 = 36;
+int counter = 0;
+
+void setup(){
+  pinmode(mux1, INPUT);
+  pinmode(mux2, INPUT);
+  pinmode(mux3, INPUT);
+  pinmode(mux3, INPUT);
+  pinmode(gyr1, INPUT);
+  pinmode(comp1, INPUT);
+  pinmode(curr1, INPUT);
+  pinmode(curr2, INPUT);
+  pinmode(curr3, INPUT);
+  pinmode(curr4, INPUT);
+  pinmode(curr5, INPUT);
+  pinmode(curr6, INPUT);
+  pinmode(muxout1, OUTPUT);
+  pinmode(muxout2, OUTPUT);
+  pinmode(muxout3, OUTPUT);
+  pinmode(muxout4, OUTPUT);
+
+  wheel0.attach(1, 1000, 2000);
+}
+
+//make some variables for the reading
+int currentpin = 1;
+float currentread1;
+float currentread2;
+float currentread3;
+float currentread4;
+float currentread5;
+float currentread6;
+
+float muxread1;
+float muxread2;
+float muxread3;
+
+void loop(){
+  //motor current loop that runs often
+  
+  digitalwrite(1, 1); //pilot lights are always on (1 & 2 pin)
+  digitalwrite(2, 1);
+
+  if (currentpin > 6) {
+    currentpin = 1;
+  }
+
+  switch(currentpin){
+    case 1:
+  currentread1 = analogread(curr1);
+    break;
+    case 2:
+  currentread2 = analogread(curr2);
+    break;
+    case 3:
+  currentread3 = analogread(curr3);
+    break;
+    case 4:
+  currentread4 = analogread(curr4);
+    break;
+    case 5:
+  currentread5 = analogread(curr5);
+    break;
+   case 6:
+  currentread6 = analogread(curr6);
+    break;
+  }
+  ++currentpin;
+  //checks the battery volts after n runs of the motor current loop
+  if(counter > 10){
+    //IF THERE IS A LOT OF STUTTERING CHANGE THIS TO A SWITCH CASE
+    //battery current check here
+    counter = 0; //set the counter back to 0, so the next check will happen in another n loops
+    muxread1 = analogread(mux1);
+    muxread2 = analogread(mux2);
+    muxread3 = analogread(mux3);
+  }
+  
+  counter = counter + 1; //increment the counter once the motor loop is over
+
+  wheel0.write(100);
+  delay(6000);
+  wheel0.write(90);
+  delay(1000);
+
+  serial.print("MUX Readins: " + mux1 + " ," + mux2 + " ," + mux3);
+  serial.print("Current Readins: "  + curr1 + " ," + curr2 + " ,"   + curr3 + " ,"  + curr4 + " ,"  + curr5 + " ,"  + curr6);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
